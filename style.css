@@ -1,0 +1,312 @@
+:root{
+  --bg:#0b0b0b;
+  --card:#1d1c1c;
+  --muted:#9b9b9b;
+  --accent:#27ae60; /* أخضر */
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:'Cairo', system-ui, Arial, sans-serif;
+  background:var(--bg);
+  color:#eee;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* خلفية كاملة مع صورة + طبقة تغميق */
+/* ضع 1.png في نفس المجلد أو غيّر المسار في url(...) إلى المسار الفعلي */
+.bg-mark{
+  position:fixed;
+  inset:0; /* يملأ الشاشة */
+  width:100%;
+  height:100%;
+  /* تركيبة: طبقة تغميق فوق الصورة */
+  background:
+    linear-gradient(rgba(11,11,11,0.62), rgba(11,11,11,0.62)),
+    url("./1.png") center/cover no-repeat;
+  pointer-events:none;
+  filter:blur(1.8px);
+  transform: scale(1.02);
+  opacity:0.95;
+  z-index:-1; /* تحت المحتوى */
+  background-blend-mode:multiply;
+  will-change: transform, filter;
+}
+
+.top-nav{padding:28px 24px; display:flex; justify-content:center}
+.top-nav .pill{
+  background:var(--accent);
+  color:#111;
+  border-radius:12px;
+  padding:10px 18px;
+  margin:0 8px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.center-wrap{
+  min-height:calc(100vh - 100px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+/* تكبير حجم البطاقة (المستطيل) هنا */
+.card{
+  width:760px; /* <- تم تكبير العرض */
+  max-width:1100px;
+  background:linear-gradient(#1a1a1a, #212121);
+  border-radius:12px;
+  padding:36px; /* زيادة بسيطة في الحشوة لتناسب العرض الأكبر */
+  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  border:1px solid rgba(255,255,255,0.03);
+  position:relative;
+  z-index:1;
+  margin:0 auto;
+}
+
+.title{
+  text-align:center;
+  color:var(--accent);
+  margin:0 0 6px;
+  font-size:26px;
+  letter-spacing:1px;
+}
+
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin:0 0 14px;
+  font-size:13px;
+}
+
+/* الحقول */
+.input{
+  width:100%;
+  display:block;
+  padding:12px 14px;
+  margin-bottom:12px;
+  border-radius:8px;
+  background:#222;
+  color:#ddd;
+  border:1px solid rgba(255,255,255,0.03);
+  outline:none;
+  font-size:14px;
+}
+
+/* جعل حقل الرقم بنفس حجم الحقول الأخرى (يمتد بعرض كامل) */
+.input.small{
+  width:100%;
+  max-width: none;
+  margin-inline-start:0;
+  display:block;
+}
+
+/* قائمة checkboxes */
+.checkbox-group{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+  margin:10px 0 18px;
+  color:#ddd;
+}
+
+.checkbox-group label{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:90%;
+  justify-content:flex-start;
+  font-size:13px;
+}
+
+.checkbox-group input[type="checkbox"]{
+  width:16px;
+  height:16px;
+  accent-color:var(--accent);
+}
+
+/* الأزرار والإجراءات */
+.actions{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+}
+
+.btn{
+  border:none;
+  padding:12px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.btn.primary{
+  background:var(--accent);
+  color:#111;
+  width:100%;
+}
+
+.btn.secondary{
+  background:transparent;
+  color:var(--accent);
+  border:1px dashed rgba(39,174,96,0.5); /* مطابق للون الأخضر */
+  width:60%;
+}
+
+/* حقل النتيجة */
+.result{
+  width:100%;
+  padding:10px 12px;
+  border-radius:8px;
+  background:#2a2a2a;
+  color:#ddd;
+  border:1px solid rgba(255,255,255,0.02);
+}
+
+/* استجابة: على الشاشات الصغيرة نرجع لعرض مرن */
+@media (max-width:980px){
+  .card{width:92%; padding:28px;}
+  .title{font-size:22px}
+}
+
+@media (max-width:480px){
+  .card{width:92%}
+  .top-nav{padding:14px}
+  .title{font-size:20px}
+  .input.small{max-width:100%}
+}
+
+/* ---------------------------------------------------
+   Keep hide/show control visible when JS adds
+   class="hidden-row" to a .row
+   --------------------------------------------------- */
+/* إخفاء كل عناصر الصف ما عدا أزرار التحكم */
+.hidden-row > *:not(.hide-btn):not(.del-btn) {
+  display: none !important;
+}
+
+/* تمييز زر الإظهار عندما يكون الصف مخفي */
+.hidden-row > .hide-btn {
+  color: #27ae60;
+  border-color: rgba(39,174,96,0.35);
+  background: rgba(0,0,0,0.06);
+}
+
+/* نحافظ على محاذاة الزر */
+.hidden-row { align-items: center; }
+
+/* ===== Custom select (dropdown) styling =====
+   - Targets: <select class="small"> and .select-input-like
+   - Arrow positioned on the right to match your screenshot
+   - Inline SVG caret used so no external asset is needed
+*/
+select.small,
+select.select-custom {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* base look */
+  display: inline-block;
+  height:38px;
+  padding: 8px 12px;
+  padding-right: 44px; /* room for the arrow on the right */
+  color: #ddd;
+  background-color: #181818;
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+
+  /* place the custom arrow (SVG) on the right (matches screenshot) */
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%239b9b9b' stroke-width='2'><path d='M4 7l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px 14px;
+
+  /* smooth transitions on focus/hover */
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+/* make sure arrow sits on the left if the page switches to LTR */
+html:not([dir="rtl"]) select.small,
+body:not([dir="rtl"]) select.small {
+  padding-right: 12px;
+  padding-left: 44px;
+  background-position: left 12px center;
+}
+
+/* focus / hover states */
+select.small:focus,
+select.small:hover {
+  border-color: rgba(39,174,96,0.8);
+  box-shadow: 0 0 0 4px rgba(39,174,96,0.06);
+  outline: none;
+  background-color: #1d1d1d;
+}
+
+/* when the select is disabled */
+select.small:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* hide native arrow in IE/Edge */
+select.small::-ms-expand {
+  display: none;
+}
+
+/* Firefox inner reset */
+select.small::-moz-focus-inner {
+  border: 0;
+}
+
+/* Optional: make the small select visually match the .input size */
+select.small {
+  box-sizing: border-box;
+  min-width: 120px;
+}
+
+/* ---------------------------
+   Select that looks like input
+   Usage: <select id="noteType" class="small select-input-like">
+   This matches .input styles and places arrow on the right.
+   --------------------------- */
+select.small.select-input-like {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* match .input look */
+  display: inline-block;
+  width: 100%;
+  min-width: 120px;
+  height: 40px;                    /* same visual height as inputs */
+  padding: 8px 44px 8px 12px;      /* room for arrow on the right */
+  color: #ddd;
+  background-color: #222;          /* same as .input background */
+  border: 1px solid rgba(255,255,255,0.03);
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  /* arrow (SVG) positioned on the right */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%239b9b9b' stroke-width='2'><path d='M4 7l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px 14px;
+
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
