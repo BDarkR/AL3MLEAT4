@@ -40,7 +40,7 @@
       display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:6px 14px;
       height:34px; line-height:1; font-size:14px; border-radius:18px; font-weight:700; white-space:nowrap;
     }
-    .btn-pill.outline { background:transparent; color:var(--accent); border:1px solid var(--accent); }
+    .btn-pill.outline { background:transparent; color:var(--accent); border:1px solid var(--accent); cursor:pointer; }
     .btn-pill.filled { background:var(--accent); color:#fff; border:1px solid var(--accent); }
 
     .card{
@@ -68,7 +68,7 @@
 
     .add-btn { background:transparent; color:var(--accent); border:1px dashed rgba(39,174,96,0.35); padding:6px 10px; border-radius:8px; cursor:pointer; }
     .controls { display:flex; gap:8px; margin-top:10px; }
-    .report-output { width:100%; min-height:220px; resize:vertical; padding:12px; background:#222; color:#ddd; border-radius:8px; border:1px solid rgba(255,255,255,0.03); white-space:pre-wrap; direction:rtl; }
+    .report-output { width:100%; min-height:220px; resize:vertical; padding:12px; background:#222; color:#ddd; border-radius:8px; border:1px solid rgba(255,255,255,0.03); white-space:pre-wrap; }
 
     .del-btn { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#ff6b6b; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700; }
     .edit-btn { background:transparent; border:1px dashed rgba(255,255,255,0.06); color:#ffd36b; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700; }
@@ -82,6 +82,11 @@
     .note-actions{ display:flex; gap:6px; align-items:center; margin-left:8px; }
 
     .spacer { height:10px; }
+
+    /* Trusted checkbox styles (per-row) */
+    .trusted-wrap { display:flex; gap:6px; align-items:center; user-select:none; }
+    .trusted-checkbox { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+    .trusted-label { color:#ddd; font-size:12px; cursor:pointer; }
 
     @media (max-width:980px){
       .card{width:92%; padding:16px;}
@@ -269,7 +274,7 @@
           <div class="row"><label>سجن 1</label><input class="input role" data-role="سجن 1" value="H-000"/></div>
           <div class="row"><label>سجن 2</label><input class="input role" data-role="سجن 2" value="H-000"/></div>
         </div>
-   
+      </div>
 
       <div id="dupWarning">هناك أكواد مكررة — تم تمييزها باللون الأحمر</div>
 
@@ -285,8 +290,6 @@
   </section>
 
   <script>
-    // الآن سلوك الإضافة: كل زر منطقة يضيف صفا بنفس اسم الزر (شمال -> "شمال N")
-    // ويتم إدراج الصف الجديد تحت آخر صف يحمل نفس الاسم (أي تحت "شمال 1" يأتي "شمال 2").
     const EXCLUDED_LABELS = ['قائد امن المنشأت','نائب قائد امن المنشأت','وقت استلام الشفت'];
     const EXCLUDE_PREFIXES = ['قيادة'];
     const EXCLUDED_INPUT_IDS = ['operations','opsDeputy','shiftTimeDisplay','noteCode','noteCount','noteType'];
@@ -298,6 +301,56 @@
       input.dataset.listenerAttached='1';
     }
 
+    // Add trusted checkbox UI to a given row (appended at the end so it appears on the LEFT visually in RTL)
+    function addCheckboxToRow(row) {
+      if (!row || !(row instanceof HTMLElement)) return;
+      if (row.classList && row.classList.contains('spacer')) return;
+      if (row.querySelector('.trusted-wrap')) return; // already exists
+
+      const trustedWrap = document.createElement('div');
+      trustedWrap.className = 'trusted-wrap';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'trusted-checkbox';
+      cb.title = 'لاعب معتمد';
+
+      const lbl = document.createElement('span');
+      lbl.className = 'trusted-label';
+      lbl.textContent = 'لاعب معتمد';
+      lbl.addEventListener('click', (e)=>{
+        // toggle checkbox on label click
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change'));
+        e.stopPropagation();
+      });
+
+      // when checkbox is checked, prompt for username and set mention into this row's input
+      cb.addEventListener('change', (ev)=>{
+        if (!cb.checked) return; // do nothing on uncheck
+        const name = prompt('ادخل اسم المستخدم ليتم منشنه في هذه الخانة (بدون @):');
+        if (!name) {
+          // user cancelled -> uncheck
+          cb.checked = false;
+          return;
+        }
+        const mention = name.startsWith('@') ? name : ('@' + name);
+        // find the input in this row (prefer .role)
+        const inp = row.querySelector('input.role') || row.querySelector('input');
+        if (inp) {
+          inp.value = mention;
+          attachRoleListener(inp);
+          checkDuplicates();
+        }
+      });
+
+      trustedWrap.appendChild(cb);
+      trustedWrap.appendChild(lbl);
+
+      // append to end of row so in RTL it will appear on the left side visually
+      row.appendChild(trustedWrap);
+    }
+
     function createRow(labelText,dataRole,targetId){
       const row = document.createElement('div'); row.className='row';
       const label = document.createElement('label'); label.textContent = labelText;
@@ -305,6 +358,7 @@
       const del = document.createElement('button'); del.type='button'; del.className='del-btn'; del.textContent='حذف';
       del.addEventListener('click', ()=> { row.remove(); checkDuplicates(); });
       row.appendChild(label); row.appendChild(input); row.appendChild(del);
+      addCheckboxToRow(row);
       attachRoleListener(input);
       return row;
     }
@@ -337,17 +391,12 @@
       btn.dataset.boundAdd = '1';
     });
 
-    // addRegionRow: insert under the last row that starts with the same region name.
     function addRegionRow(regionName) {
       const list = document.getElementById('coastalList');
       if (!list) return;
       const allRows = Array.from(list.querySelectorAll('.row'));
-
-      // regex to find existing rows for this region (e.g., "شمال 1")
       const escRegion = regionName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
       const regexSelf = new RegExp('^' + escRegion + '\\s+(\\d+)$');
-
-      // find existing indices and same-name rows
       const indicesSelf = [];
       const sameRows = [];
       allRows.forEach(r=>{
@@ -362,7 +411,6 @@
         }
       });
 
-      // compute smallest missing index
       const idxSet = new Set(indicesSelf);
       let idxSelf = 1;
       while (idxSet.has(idxSelf)) idxSelf++;
@@ -370,7 +418,6 @@
       const labelText = regionName + ' ' + idxSelf;
       const newRow = createRow(labelText, labelText, 'coastalList');
 
-      // If there are existing rows with same region, insert after the last one
       if (sameRows.length) {
         sameRows[sameRows.length - 1].after(newRow);
         bindStaticRowDeleteButtons();
@@ -378,7 +425,6 @@
         return;
       }
 
-      // Fallback: try to insert near the logical group position (before the first spacer of that region order)
       const order = ['شمال','جنوب','شرق','غرب'];
       const idxOrder = order.indexOf(regionName);
       let inserted = false;
@@ -396,7 +442,6 @@
         }
       }
       if (!inserted) {
-        // append to end
         list.appendChild(newRow);
       }
 
@@ -404,7 +449,6 @@
       checkDuplicates();
     }
 
-    // addNamedRow: behave as before (adds/name N). If same-name rows exist inserts after last same-name.
     function addNamedRow(name) {
       const list = document.getElementById('coastalList');
       if (!list) return;
@@ -422,7 +466,6 @@
         if (m) { indices.push(parseInt(m[1],10)); sameRows.push(r); }
       });
 
-      // smallest missing index
       const set = new Set(indices);
       let idx = 1;
       while (set.has(idx)) idx++;
@@ -437,7 +480,6 @@
         return;
       }
 
-      // fallback insert near logical region (previous behavior)
       const regionMap = { 'شين':'شمال', 'جيم':'جنوب', 'قاف':'شرق', 'غين':'غرب' };
       const targetRegion = regionMap[name] || '';
       if (targetRegion) {
@@ -470,7 +512,6 @@
       });
     }
 
-    // duplicate check
     function checkDuplicates(){
       const inputs = Array.from(document.querySelectorAll('.role'));
       const map = new Map();
@@ -505,7 +546,6 @@
       if (dupFound) document.getElementById('dupWarning').style.display='block';
     }
 
-    // build report helpers & main buildReportText (unchanged)
     function appendFromContainer(containerId, out, addBlankAfter = false) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -619,7 +659,6 @@
       return out.join('\n');
     }
 
-    // copy/report buttons
     const buildBtn = document.getElementById('buildReport');
     const copyBtn = document.getElementById('copyReport');
     const output = document.getElementById('reportOutput');
@@ -638,19 +677,31 @@
       } catch(e) { alert('فشل النسخ — جرّب يدوياً'); }
     });
 
-    // initial binding
+    // NOTE: تمت إزالة زر "لاعب معتمد" من الشريط العلوي والوظيفة المرتبطة به.
+    // يبقى السلوك الخاص بمربعات "لاعب معتمد" لكل صف (تفتح prompt عند التفعيل) كما هو.
+
+    // initial binding: add checkboxes to existing rows, attach listeners
     document.querySelectorAll('.row').forEach(r=>{
+      addCheckboxToRow(r);
       const roleInp = r.querySelector('.role'); if (roleInp) attachRoleListener(roleInp);
     });
     bindStaticRowDeleteButtons();
     checkDuplicates();
 
-    // observe dynamic changes to attach listeners to newly added rows
+    // observe dynamic changes to attach listeners and add checkbox UI to newly added rows
     const observer = new MutationObserver(muts=>{
       muts.forEach(m=>{
         m.addedNodes.forEach(node=>{
           if (!(node instanceof HTMLElement)) return;
-          node.querySelectorAll && node.querySelectorAll('.role').forEach(attachRoleListener);
+          if (node.classList && node.classList.contains('row')) {
+            addCheckboxToRow(node);
+            node.querySelectorAll && node.querySelectorAll('.role').forEach(attachRoleListener);
+          } else {
+            node.querySelectorAll && node.querySelectorAll('.row').forEach(r=>{
+              addCheckboxToRow(r);
+              r.querySelectorAll && r.querySelectorAll('.role').forEach(attachRoleListener);
+            });
+          }
           bindStaticRowDeleteButtons();
         });
       });
