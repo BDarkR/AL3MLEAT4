@@ -18,6 +18,7 @@
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
       padding:18px;
+      direction: rtl; /* force RTL */
     }
 
     .bg-mark{
@@ -62,33 +63,25 @@
     }
 
     .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
-    .row label { min-width:160px; font-size:14px; color:#ddd; }
+    .row label { min-width:160px; font-size:14px; color:#ddd; text-align:right; }
     .row .input { flex:1; margin-bottom:0; padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.04); background:#222; color:#ddd }
 
     .add-btn { background:transparent; color:var(--accent); border:1px dashed rgba(39,174,96,0.35); padding:6px 10px; border-radius:8px; cursor:pointer; }
     .controls { display:flex; gap:8px; margin-top:10px; }
-    .report-output { width:100%; min-height:220px; resize:vertical; padding:12px; background:#222; color:#ddd; border-radius:8px; border:1px solid rgba(255,255,255,0.03); white-space:pre-wrap; direction:rtl }
+    .report-output { width:100%; min-height:220px; resize:vertical; padding:12px; background:#222; color:#ddd; border-radius:8px; border:1px solid rgba(255,255,255,0.03); white-space:pre-wrap; direction:rtl; }
 
     .del-btn { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#ff6b6b; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700; }
     .edit-btn { background:transparent; border:1px dashed rgba(255,255,255,0.06); color:#ffd36b; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700; }
-    .hide-btn { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#9b9b9b; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700; }
 
     .role.duplicate { border-color:#e74c3c !important; color:#ffb3b3 !important; background:rgba(231,76,60,0.04); }
     .row label.duplicate-label { color:#ff6b6b !important; }
     #dupWarning { color:#ff6b6b; display:none; margin-top:8px; font-size:13px; }
 
-    .player-wrap { display:flex; gap:6px; align-items:center; }
-    .playerChk { width:18px; height:18px; cursor:pointer; }
-    .playerMention { width:160px; padding:6px; border-radius:6px; border:1px solid rgba(255,255,255,0.04); background:#222; color:#ddd; display:none; font-size:13px; }
-
-    /* keep hide/show control visible when JS hides row */
-    .hidden-row > *:not(.hide-btn):not(.del-btn) { display: none !important; }
-    .hidden-row > .hide-btn { color: #27ae60; border-color: rgba(39,174,96,0.35); background: rgba(0,0,0,0.06); }
-    .hidden-row { align-items:center; }
-
     .note-item{ display:flex; gap:8px; align-items:center; justify-content:space-between; padding:6px 8px; border-radius:6px; }
     .note-text{ color:#ddd; flex:1; padding-right:8px; }
     .note-actions{ display:flex; gap:6px; align-items:center; margin-left:8px; }
+
+    .spacer { height:10px; }
 
     @media (max-width:980px){
       .card{width:92%; padding:16px;}
@@ -159,8 +152,8 @@
       <div class="section" id="radaSection">
         <h3>ردع (قابل للإضافة)</h3>
         <div id="radaList">
-          <div class="row"><label>ردع 1</label><input class="input role" data-role="ردع 1" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>ردع 2</label><input class="input role" data-role="ردع 2" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
+          <div class="row"><label>ردع 1</label><input class="input role" data-role="ردع 1" value="H-000"/></div>
+          <div class="row"><label>ردع 2</label><input class="input role" data-role="ردع 2" value="H-000"/></div>
         </div>
         <button type="button" class="add-btn" data-target="radaList">＋ إضافة ردع</button>
       </div>
@@ -168,15 +161,33 @@
       <div class="section" id="radSection">
         <h3>رعد (قابل للإضافة)</h3>
         <div id="radList">
-          <div class="row"><label>رعد 1</label><input class="input role" data-role="رعد 1" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>رعد 2</label><input class="input role" data-role="رعد 2" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>رعد 3</label><input class="input role" data-role="رعد 3" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
+          <div class="row"><label>رعد 1</label><input class="input role" data-role="رعد 1" value="H-000"/></div>
+          <div class="row"><label>رعد 2</label><input class="input role" data-role="رعد 2" value="H-000"/></div>
+          <div class="row"><label>رعد 3</label><input class="input role" data-role="رعد 3" value="H-000"/></div>
         </div>
         <button type="button" class="add-btn" data-target="radList">＋ إضافة رعد</button>
       </div>
 
       <div class="section" id="regionsSection">
-        <h3>المناطق</h3>
+        <h3>الوحدات</h3>
+
+        <!-- region add buttons + specific-name buttons -->
+        <div class="row" style="align-items:center;">
+          <label>أضف وحدة</label>
+          <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap;">
+            <button type="button" class="add-btn" data-region="شمال" id="addNorthBtn">＋ شمال</button>
+            <button type="button" class="add-btn" data-region="جنوب" id="addSouthBtn">＋ جنوب</button>
+            <button type="button" class="add-btn" data-region="شرق" id="addEastBtn">＋ شرق</button>
+            <button type="button" class="add-btn" data-region="غرب" id="addWestBtn">＋ غرب</button>
+
+            <!-- شين / جيم / قاف / غين -->
+            <button type="button" class="add-btn" data-addname="شين" id="addSheenBtn">＋ شين</button>
+            <button type="button" class="add-btn" data-addname="جيم" id="addJeemBtn">＋ جيم</button>
+            <button type="button" class="add-btn" data-addname="قاف" id="addQafBtn">＋ قاف</button>
+            <button type="button" class="add-btn" data-addname="غين" id="addGhaynBtn">＋ غين</button>
+          </div>
+        </div>
+
         <div id="coastalList">
           <!-- شمال -->
           <div class="row"><label>شمال 1</label><input class="input role" data-role="شمال 1" value="H-000"/></div>
@@ -185,6 +196,9 @@
           <div class="row"><label>شين 2</label><input class="input role" data-role="شين 2" value="H-000"/></div>
           <div class="row"><label>شين 3</label><input class="input role" data-role="شين 3" value="H-000"/></div>
 
+          <!-- spacer between شمال and جنوب -->
+          <div class="row spacer"></div>
+
           <!-- جنوب -->
           <div class="row"><label>جنوب 1</label><input class="input role" data-role="جنوب 1" value="H-000"/></div>
           <div class="row"><label>رمح 2</label><input class="input role" data-role="رمح 2" value="H-000"/></div>
@@ -192,12 +206,18 @@
           <div class="row"><label>جيم 2</label><input class="input role" data-role="جيم 2" value="H-000"/></div>
           <div class="row"><label>جيم 3</label><input class="input role" data-role="جيم 3" value="H-000"/></div>
 
+          <!-- spacer between جنوب and شرق -->
+          <div class="row spacer"></div>
+
           <!-- شرق -->
           <div class="row"><label>شرق 1</label><input class="input role" data-role="شرق 1" value="H-000"/></div>
           <div class="row"><label>رمح 3</label><input class="input role" data-role="رمح 3" value="H-000"/></div>
           <div class="row"><label>قاف 1</label><input class="input role" data-role="قاف 1" value="H-000"/></div>
           <div class="row"><label>قاف 2</label><input class="input role" data-role="قاف 2" value="H-000"/></div>
           <div class="row"><label>قاف 3</label><input class="input role" data-role="قاف 3" value="H-000"/></div>
+
+          <!-- spacer between شرق and غرب -->
+          <div class="row spacer"></div>
 
           <!-- غرب -->
           <div class="row"><label>غرب 1</label><input class="input role" data-role="غرب 1" value="H-000"/></div>
@@ -252,23 +272,7 @@
       </div>
 
       <div class="section" id="notesSection">
-        <div class="row">
-          <label class="green-heading">ملاحظة رئيسية</label>
-          <input id="noteField" class="input" value="" />
-        </div>
-
-        <div class="row">
-          <label>إضافة بند للملاحظة</label>
-          <div class="note-controls" style="flex:1;display:flex;gap:8px;align-items:center">
-            <input id="noteCode" class="input small" placeholder="مثال: H-018" />
-            <input id="noteCount" class="input small" placeholder="رقم التوجيه" />
-            <select id="noteType" class="small">
-              <option value="">نوع</option><option value="حرة">حرة</option><option value="سهم">سهم</option><option value="صقر">صقر</option><option value="برق">برق</option><option value="ردع">ردع</option>
-            </select>
-            <button type="button" id="addNoteBtn" class="add-btn">＋ إضافة</button>
-          </div>
-        </div>
-
+        <h3>ملاحظات مضافة</h3>
         <div class="row" style="align-items:flex-start;">
           <label>ملاحظات مضافة</label>
           <div id="notesList" style="flex:1;display:flex;flex-direction:column;gap:6px"></div>
@@ -289,60 +293,11 @@
   </section>
 
   <script>
-    // lists where hide-btn (not delete) is used
-    const HIDE_LIST_IDS = ['huraList','saqrList','radList','radaList','sahmList'];
-
+    // الآن سلوك الإضافة: كل زر منطقة يضيف صفا بنفس اسم الزر (شمال -> "شمال N")
+    // ويتم إدراج الصف الجديد تحت آخر صف يحمل نفس الاسم (أي تحت "شمال 1" يأتي "شمال 2").
     const EXCLUDED_LABELS = ['قائد امن المنشأت','نائب قائد امن المنشأت','وقت استلام الشفت'];
     const EXCLUDE_PREFIXES = ['قيادة'];
-    const EXCLUDED_INPUT_IDS = ['operations','opsDeputy','shiftTimeDisplay','noteField','noteCode','noteCount','noteType'];
-
-    function addPlayerWrapToRowIfAllowed(row) {
-      if (!row || !(row instanceof HTMLElement)) return;
-      if (row.closest && (row.closest('#notesSection') || row.closest('#notesList') || row.closest('.note-item') || row.closest('.note-controls'))) {
-        return;
-      }
-      if (row.querySelector('.player-wrap')) return;
-      const lbl = row.querySelector('label');
-      const labelText = lbl ? (lbl.textContent||'').trim() : '';
-      const inputs = Array.from(row.querySelectorAll('input'));
-      for (const inp of inputs) if (inp.id && EXCLUDED_INPUT_IDS.includes(inp.id)) return;
-      if (EXCLUDED_LABELS.includes(labelText)) return;
-      for (const p of EXCLUDE_PREFIXES) if (labelText.startsWith(p)) return;
-      if (labelText === 'العمليات' || labelText === 'نائب العمليات') return;
-
-      const playerWrap = document.createElement('div');
-      playerWrap.className = 'player-wrap';
-      const chk = document.createElement('input');
-      chk.type = 'checkbox'; chk.className = 'playerChk'; chk.title = 'لاعب معتمد';
-      const span = document.createElement('span'); span.className='playerLabel'; span.textContent='لاعب معتمد';
-      const mention = document.createElement('input'); mention.className='playerMention'; mention.placeholder='@player';
-      playerWrap.appendChild(chk); playerWrap.appendChild(span); playerWrap.appendChild(mention);
-
-      const btn = row.querySelector('.hide-btn, .del-btn');
-      if (btn) row.insertBefore(playerWrap, btn);
-      else row.appendChild(playerWrap);
-
-      bindPlayerToggle(row);
-    }
-
-    function bindPlayerToggle(row) {
-      const chk = row.querySelector('.playerChk');
-      const mention = row.querySelector('.playerMention');
-      const codeInput = row.querySelector('.role');
-      if (!chk || !mention) return;
-      if (chk.dataset.bound==='1') return;
-      chk.addEventListener('change', ()=>{
-        if (chk.checked) mention.style.display='inline-block';
-        else {
-          mention.style.display='none';
-          mention.value = '';
-        }
-        if (!chk.checked && codeInput) checkDuplicates();
-        else if (chk.checked && codeInput) codeInput.classList.remove('duplicate');
-      });
-      mention.addEventListener('input', checkDuplicates);
-      chk.dataset.bound='1';
-    }
+    const EXCLUDED_INPUT_IDS = ['operations','opsDeputy','shiftTimeDisplay','noteCode','noteCount','noteType'];
 
     function attachRoleListener(input) {
       if (!input) return;
@@ -355,68 +310,160 @@
       const row = document.createElement('div'); row.className='row';
       const label = document.createElement('label'); label.textContent = labelText;
       const input = document.createElement('input'); input.className='input role'; input.setAttribute('data-role',dataRole); input.value='H-000';
-
-      if (HIDE_LIST_IDS.includes(targetId)) {
-        const hideBtn = document.createElement('button'); hideBtn.type='button'; hideBtn.className='hide-btn'; hideBtn.textContent='اخفاء';
-        const del = document.createElement('button'); del.type='button'; del.className='del-btn'; del.textContent='حذف';
-        del.addEventListener('click', ()=> { row.remove(); checkDuplicates(); });
-        row.appendChild(label); row.appendChild(input); row.appendChild(hideBtn); row.appendChild(del);
-      } else {
-        const del = document.createElement('button'); del.type='button'; del.className='del-btn'; del.textContent='حذف';
-        del.addEventListener('click', ()=> { row.remove(); checkDuplicates(); });
-        row.appendChild(label); row.appendChild(input); row.appendChild(del);
-      }
+      const del = document.createElement('button'); del.type='button'; del.className='del-btn'; del.textContent='حذف';
+      del.addEventListener('click', ()=> { row.remove(); checkDuplicates(); });
+      row.appendChild(label); row.appendChild(input); row.appendChild(del);
       attachRoleListener(input);
-      addPlayerWrapToRowIfAllowed(row);
       return row;
     }
 
+    // Safe binding for add buttons
     document.querySelectorAll('.add-btn').forEach(btn=>{
+      if (btn.dataset.boundAdd === '1') return;
       btn.addEventListener('click', ()=>{
         const target = btn.getAttribute('data-target');
-        const list = document.getElementById(target);
-        if (!list) return console.warn('add-btn: target not found ->', target);
-        const existing = list.querySelectorAll('.row').length;
-        const index = existing + 1;
-        const firstLabel = list.querySelector('.row label');
-        const base = firstLabel ? firstLabel.textContent.split(' ')[0] || 'عنصر' : 'عنصر';
-        const labelText = base + ' ' + index;
-        const newRow = createRow(labelText, labelText, target);
-        list.appendChild(newRow);
-        bindRowHideButtons();
-        bindStaticRowDeleteButtons();
-        checkDuplicates();
+        const region = btn.getAttribute('data-region');
+        const name = btn.getAttribute('data-addname');
+        if (target) {
+          const list = document.getElementById(target);
+          if (!list) return console.warn('add-btn: target not found ->', target);
+          const existing = list.querySelectorAll('.row').length;
+          const index = existing + 1;
+          const firstLabel = list.querySelector('.row label');
+          const base = firstLabel ? firstLabel.textContent.split(' ')[0] || 'عنصر' : 'عنصر';
+          const labelText = base + ' ' + index;
+          const newRow = createRow(labelText, labelText, target);
+          list.appendChild(newRow);
+          bindStaticRowDeleteButtons();
+          checkDuplicates();
+        } else if (region) {
+          addRegionRow(region);
+        } else if (name) {
+          addNamedRow(name);
+        }
       });
+      btn.dataset.boundAdd = '1';
     });
 
-    function toggleHideRow(row, btn){
-      if (!row || !btn) return;
-      const wasHidden = row.dataset.hidden==='true';
-      if (wasHidden) {
-        row.dataset.hidden='false';
-        row.classList.remove('hidden-row');
-        btn.textContent='اخفاء';
-      } else {
-        row.dataset.hidden='true';
-        row.classList.add('hidden-row');
-        btn.textContent='اظهار';
+    // addRegionRow: insert under the last row that starts with the same region name.
+    function addRegionRow(regionName) {
+      const list = document.getElementById('coastalList');
+      if (!list) return;
+      const allRows = Array.from(list.querySelectorAll('.row'));
+
+      // regex to find existing rows for this region (e.g., "شمال 1")
+      const escRegion = regionName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      const regexSelf = new RegExp('^' + escRegion + '\\s+(\\d+)$');
+
+      // find existing indices and same-name rows
+      const indicesSelf = [];
+      const sameRows = [];
+      allRows.forEach(r=>{
+        if (r.classList && r.classList.contains('spacer')) return;
+        const labelNode = r.querySelector('label');
+        if (!labelNode) return;
+        const txt = (labelNode.textContent || '').trim();
+        const m = txt.match(regexSelf);
+        if (m) {
+          indicesSelf.push(parseInt(m[1], 10));
+          sameRows.push(r);
+        }
+      });
+
+      // compute smallest missing index
+      const idxSet = new Set(indicesSelf);
+      let idxSelf = 1;
+      while (idxSet.has(idxSelf)) idxSelf++;
+
+      const labelText = regionName + ' ' + idxSelf;
+      const newRow = createRow(labelText, labelText, 'coastalList');
+
+      // If there are existing rows with same region, insert after the last one
+      if (sameRows.length) {
+        sameRows[sameRows.length - 1].after(newRow);
+        bindStaticRowDeleteButtons();
+        checkDuplicates();
+        return;
       }
+
+      // Fallback: try to insert near the logical group position (before the first spacer of that region order)
+      const order = ['شمال','جنوب','شرق','غرب'];
+      const idxOrder = order.indexOf(regionName);
+      let inserted = false;
+      for (let k = idxOrder + 1; k < order.length; k++) {
+        const nextRegion = order[k];
+        const nextRow = allRows.find(r=>{
+          if (r.classList && r.classList.contains('spacer')) return false;
+          const ln = r.querySelector('label'); if (!ln) return false;
+          return (ln.textContent||'').trim().startsWith(nextRegion + ' ');
+        });
+        if (nextRow) {
+          nextRow.before(newRow);
+          inserted = true;
+          break;
+        }
+      }
+      if (!inserted) {
+        // append to end
+        list.appendChild(newRow);
+      }
+
+      bindStaticRowDeleteButtons();
       checkDuplicates();
     }
 
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest && e.target.closest('.hide-btn');
-      if (!btn) return;
-      const row = btn.closest('.row');
-      if (!row) return;
-      toggleHideRow(row, btn);
-    });
+    // addNamedRow: behave as before (adds/name N). If same-name rows exist inserts after last same-name.
+    function addNamedRow(name) {
+      const list = document.getElementById('coastalList');
+      if (!list) return;
+      const allRows = Array.from(list.querySelectorAll('.row'));
+      const esc = name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      const regex = new RegExp('^' + esc + '\\s+(\\d+)$');
 
-    function bindRowHideButtons(){
-      document.querySelectorAll('.hide-btn').forEach(btn=>{
-        if (btn.dataset.boundHide==='1') return;
-        btn.dataset.boundHide='1';
+      const indices = [];
+      const sameRows = [];
+      allRows.forEach(r=>{
+        if (r.classList && r.classList.contains('spacer')) return;
+        const ln = r.querySelector('label'); if (!ln) return;
+        const txt = (ln.textContent||'').trim();
+        const m = txt.match(regex);
+        if (m) { indices.push(parseInt(m[1],10)); sameRows.push(r); }
       });
+
+      // smallest missing index
+      const set = new Set(indices);
+      let idx = 1;
+      while (set.has(idx)) idx++;
+
+      const labelText = name + ' ' + idx;
+      const newRow = createRow(labelText, labelText, 'coastalList');
+
+      if (sameRows.length) {
+        sameRows[sameRows.length - 1].after(newRow);
+        bindStaticRowDeleteButtons();
+        checkDuplicates();
+        return;
+      }
+
+      // fallback insert near logical region (previous behavior)
+      const regionMap = { 'شين':'شمال', 'جيم':'جنوب', 'قاف':'شرق', 'غين':'غرب' };
+      const targetRegion = regionMap[name] || '';
+      if (targetRegion) {
+        const regionRow = allRows.find(r=>{
+          if (r.classList && r.classList.contains('spacer')) return false;
+          const ln = r.querySelector('label'); if (!ln) return false;
+          return (ln.textContent||'').trim().startsWith(targetRegion + ' ');
+        });
+        if (regionRow) regionRow.before(newRow);
+        else list.appendChild(newRow);
+      } else {
+        const spacer = allRows.find(r=> r.classList && r.classList.contains('spacer'));
+        if (spacer) list.insertBefore(newRow, spacer);
+        else list.appendChild(newRow);
+      }
+
+      bindStaticRowDeleteButtons();
+      checkDuplicates();
     }
 
     function bindStaticRowDeleteButtons(){
@@ -439,8 +486,6 @@
         const row = inp.closest('.row');
         if (!row) return;
         if (row.dataset.hidden==='true' || getComputedStyle(row).display==='none') return;
-        const playerChk = row.querySelector('.playerChk');
-        if (playerChk && playerChk.checked) return;
         const v = (inp.value||'').trim().toUpperCase();
         if (!v || v==='H-000' || v.startsWith('@')) return;
         if (!map.has(v)) map.set(v,[]);
@@ -468,148 +513,7 @@
       if (dupFound) document.getElementById('dupWarning').style.display='block';
     }
 
-    // Notes handling
-    const addNoteBtn = document.getElementById('addNoteBtn');
-    const notesList = document.getElementById('notesList');
-
-    function createNoteItem(code,count,type){
-      const wrapper = document.createElement('div');
-      wrapper.className='note-item';
-      wrapper.dataset.code = code||'';
-      wrapper.dataset.count = count||'';
-      wrapper.dataset.type = type||'';
-      wrapper.dataset.edited='false';
-      wrapper.dataset.mention = '';
-
-      const txt = document.createElement('span'); txt.className='note-text';
-      txt.textContent = formatNoteText(code,count,type);
-
-      const playerWrap = document.createElement('div'); playerWrap.className='player-wrap';
-      const chk = document.createElement('input'); chk.type='checkbox'; chk.className='playerChk';
-      const lbl = document.createElement('span'); lbl.className='playerLabel'; lbl.textContent='لاعب معتمد';
-      const mention = document.createElement('input'); mention.type='text'; mention.className='playerMention'; mention.placeholder='@player';
-      mention.style.display='none';
-
-      chk.addEventListener('change', ()=> {
-        if (chk.checked) mention.style.display='inline-block';
-        else { mention.style.display='none'; mention.value=''; wrapper.dataset.mention = ''; }
-      });
-      mention.addEventListener('input', ()=> {
-        wrapper.dataset.mention = mention.value.trim();
-      });
-
-      playerWrap.appendChild(chk); playerWrap.appendChild(lbl); playerWrap.appendChild(mention);
-
-      const actions = document.createElement('div'); actions.className='note-actions';
-      const edit = document.createElement('button'); edit.type='button'; edit.className='edit-btn'; edit.textContent='تعديل';
-      const del = document.createElement('button'); del.type='button'; del.className='del-btn'; del.textContent='حذف';
-      edit.addEventListener('click', ()=> enterEditMode(wrapper));
-      del.addEventListener('click', ()=> wrapper.remove());
-
-      actions.appendChild(edit); actions.appendChild(del);
-
-      wrapper.appendChild(txt);
-      wrapper.appendChild(playerWrap);
-      wrapper.appendChild(actions);
-
-      return wrapper;
-    }
-
-    function formatNoteText(code, count, type){
-      if (!code && !count && !type) return '';
-      const parts = [];
-      if (code) parts.push(code + ':');
-      if (count) parts.push(count);
-      if (type) parts.push(type);
-      return parts.join(' ');
-    }
-
-    function enterEditMode(wrapper){
-      const currentCode = wrapper.dataset.code||'';
-      const currentCount = wrapper.dataset.count||'';
-      const currentType = wrapper.dataset.type||'';
-      const currentMention = wrapper.dataset.mention||'';
-
-      const txt = wrapper.querySelector('.note-text');
-      if (!txt) return;
-
-      const editor = document.createElement('div');
-      editor.style.display='flex';
-      editor.style.gap='8px';
-      editor.style.alignItems='center';
-
-      const codeIn = document.createElement('input'); codeIn.className='input small'; codeIn.value=currentCode; codeIn.placeholder='H-914';
-      const countIn = document.createElement('input'); countIn.className='input small'; countIn.value=currentCount; countIn.placeholder='كم';
-      const typeSel = document.createElement('select'); typeSel.className='small';
-      ['','حرة','سهم','صقر','برق','ردع'].forEach(v=>{
-        const o=document.createElement('option'); o.value=v; o.textContent=v||'نوع';
-        if (v===currentType) o.selected=true;
-        typeSel.appendChild(o);
-      });
-
-      const chk = document.createElement('input'); chk.type='checkbox'; chk.className='playerChk';
-      const mentionIn = document.createElement('input'); mentionIn.className='playerMention'; mentionIn.placeholder='@player';
-      mentionIn.value = currentMention || '';
-      if (currentMention) { mentionIn.style.display='inline-block'; chk.checked = true; } else { mentionIn.style.display='none'; }
-
-      chk.addEventListener('change', ()=> {
-        if (chk.checked) mentionIn.style.display='inline-block';
-        else { mentionIn.style.display='none'; mentionIn.value=''; }
-      });
-
-      const save = document.createElement('button'); save.type='button'; save.className='add-btn'; save.textContent='حفظ';
-      const cancel = document.createElement('button'); cancel.type='button'; cancel.className='del-btn'; cancel.textContent='إلغاء';
-
-      save.addEventListener('click', ()=> {
-        wrapper.dataset.code = codeIn.value.trim();
-        wrapper.dataset.count = countIn.value.trim();
-        wrapper.dataset.type = typeSel.value;
-        wrapper.dataset.mention = chk.checked && mentionIn.value.trim() ? mentionIn.value.trim() : '';
-        wrapper.dataset.edited = 'true';
-
-        txt.textContent = formatNoteText(wrapper.dataset.code, wrapper.dataset.count, wrapper.dataset.type);
-
-        editor.replaceWith(txt);
-
-        const notePlayerChk = wrapper.querySelector('.playerChk');
-        const noteMention = wrapper.querySelector('.playerMention');
-        if (notePlayerChk && noteMention) {
-          if (wrapper.dataset.mention && wrapper.dataset.mention.length) {
-            notePlayerChk.checked = true;
-            noteMention.value = wrapper.dataset.mention;
-            noteMention.style.display = 'inline-block';
-          } else {
-            notePlayerChk.checked = false;
-            noteMention.value = '';
-            noteMention.style.display = 'none';
-          }
-        }
-
-        checkDuplicates();
-      });
-
-      cancel.addEventListener('click', ()=> {
-        editor.replaceWith(txt);
-      });
-
-      editor.appendChild(codeIn); editor.appendChild(countIn); editor.appendChild(typeSel);
-      editor.appendChild(chk); editor.appendChild(mentionIn);
-      editor.appendChild(save); editor.appendChild(cancel);
-
-      txt.replaceWith(editor);
-    }
-
-    addNoteBtn.addEventListener('click', ()=>{
-      const code = document.getElementById('noteCode').value.trim();
-      const count = document.getElementById('noteCount').value.trim();
-      const type = document.getElementById('noteType').value;
-      if (!code && !count && !type) return;
-      const item = createNoteItem(code,count,type);
-      notesList.appendChild(item);
-      document.getElementById('noteCode').value=''; document.getElementById('noteCount').value='';
-    });
-
-    // append helpers - revised so they DON'T add extra trailing blank by default.
+    // build report helpers & main buildReportText (unchanged)
     function appendFromContainer(containerId, out, addBlankAfter = false) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -619,34 +523,27 @@
         if (row.dataset.hidden==='true' || getComputedStyle(row).display==='none') return;
         const roleName = (row.querySelector('label')||{}).textContent || '';
         const codeInput = row.querySelector('.role');
-        const playerChk = row.querySelector('.playerChk');
-        const mention = row.querySelector('.playerMention');
         let val = 'H-000';
-        if (playerChk && playerChk.checked) {
-          const raw = (mention && mention.value)?mention.value.trim():'';
-          if (raw) val = raw.startsWith('@')?raw:('@'+raw); else val='@';
-        } else if (codeInput) {
-          val = (codeInput.value && codeInput.value.trim())? codeInput.value.trim() : 'H-000';
-        }
+        if (codeInput) val = (codeInput.value && codeInput.value.trim())? codeInput.value.trim() : 'H-000';
         if (roleName) out.push(roleName + ' : ' + val);
       });
       if (addBlankAfter) out.push('');
     }
 
-    // coastal groups now act as generic region list; keep internal order
     function appendCoastalWithGaps(out){
       const container = document.getElementById('coastalList'); if (!container) return;
       const rows = Array.from(container.querySelectorAll('.row'));
       rows.forEach(r => {
-        if (r.dataset.hidden==='true') return;
+        if (r.dataset.hidden==='true' || getComputedStyle(r).display==='none') return;
+        if (r.classList && r.classList.contains('spacer')) { out.push(''); return; }
         const roleName = (r.querySelector('label')||{}).textContent || '';
-        const codeInput = r.querySelector('.role'); const playerChk = r.querySelector('.playerChk'); const mention = r.querySelector('.playerMention');
-        let val='H-000'; if (playerChk && playerChk.checked) { const raw=(mention && mention.value)?mention.value.trim():''; if (raw) val = raw.startsWith('@')?raw:('@'+raw); else val='@'; } else if (codeInput) { val = (codeInput.value && codeInput.value.trim())? codeInput.value.trim() : 'H-000'; }
+        const codeInput = r.querySelector('.role');
+        let val='H-000';
+        if (codeInput) val = (codeInput.value && codeInput.value.trim())? codeInput.value.trim() : 'H-000';
         if (roleName) out.push(roleName + ' : ' + val);
       });
     }
 
-    // build report - precise control of blanks:
     function buildReportText(){
       checkDuplicates();
       const out=[];
@@ -666,7 +563,6 @@
       out.push('نائب العمليات : ' + (opsDeputy || ''));
       out.push('');
 
-      // leaders block
       const leaderMain = document.querySelector('input[data-role="قائد قوات الطوارئ"]');
       if (leaderMain) out.push(leaderMain.getAttribute('data-role') + ' : ' + (leaderMain.value && leaderMain.value.trim() ? leaderMain.value.trim() : 'H-000'));
       const leaderAssist = document.querySelector('input[data-role="مساعد قائد قوات الطوارئ"]');
@@ -676,82 +572,57 @@
       appendFromContainer('leadershipList', out, false);
       out.push('');
 
-      // dh officer
       const dh = document.querySelector('input[data-role="ضابط خفر"]');
       if (dh) {
-        const row = dh.closest('.row'); const playerChk = row?row.querySelector('.playerChk'):null; const mention = row?row.querySelector('.playerMention'):null;
         let val = (dh.value && dh.value.trim())?dh.value.trim():'H-000';
-        if (playerChk && playerChk.checked) { const raw = (mention && mention.value)?mention.value.trim():''; val = raw? (raw.startsWith('@')?raw:('@'+raw)) : '@'; }
         out.push(dh.getAttribute('data-role') + ' : ' + val);
       }
       out.push('');
 
-      // rada and rad
       appendFromContainer('radaList', out, false);
       out.push('');
       appendFromContainer('radList', out, false);
       out.push('');
 
-      // regions (north/south/east/west)
       appendCoastalWithGaps(out);
       out.push('');
 
-      // police
       const police = document.querySelector('input[data-role="شرطة عسكرية"]');
       if (police) {
-        const row = police.closest('.row'); const playerChk = row?row.querySelector('.playerChk'):null; const mention = row?row.querySelector('.playerMention'):null;
         let val = (police.value && police.value.trim())?police.value.trim():'H-000';
-        if (playerChk && playerChk.checked) { const raw = (mention && mention.value)?mention.value.trim():''; val = raw? (raw.startsWith('@')?raw:('@'+raw)) : '@'; }
         out.push(police.getAttribute('data-role') + ' : ' + val);
         out.push('');
       }
 
-      // الجنائي
       out.push('البحث الجنائي');
       out.push('');
       appendFromContainer('criminalList', out, false);
       out.push('');
 
-      // القوات الخاصة
       out.push('القوات الخاصة');
       out.push('');
       appendFromContainer('specialForcesList', out, false);
       out.push('');
 
-      // الأمن والحماية
       out.push('الأمن والحماية');
       out.push('');
       appendFromContainer('securityList', out, false);
       out.push('');
 
-      // prisons / عين
       appendFromContainer('prisonsSection', out, false);
       out.push('');
 
-      // notes
       const noteItems = Array.from(document.querySelectorAll('#notesList .note-item'));
       if (noteItems.length>0) {
-        const mainNote = (document.getElementById('noteField').value||'').trim();
         out.push('ملاحظات التقرير :');
-        if (mainNote) out.push(mainNote + ' :');
         noteItems.forEach(it=>{
           const code = it.dataset.code||''; const count = it.dataset.count||''; const type = it.dataset.type||'';
-          const playerChk = it.querySelector('.playerChk');
-          const mention = it.querySelector('.playerMention');
-          let line = '';
-          if (playerChk && playerChk.checked) {
-            const raw = (mention && mention.value)? mention.value.trim() : '';
-            const m = raw ? (raw.startsWith('@') ? raw : ('@'+raw)) : '@';
-            line = m + (type ? (' ' + type) : '') + (count ? (' ' + count) : '');
-          } else {
-            let parts=[]; if (code) parts.push(code+':'); if (count) parts.push(count); if (type) parts.push(type);
-            line = parts.join(' ');
-          }
-          if (line) { out.push(line); }
+          let parts=[]; if (code) parts.push(code+':'); if (count) parts.push(count); if (type) parts.push(type);
+          const line = parts.join(' ');
+          if (line) out.push(line);
         });
       }
 
-      // normalize: remove trailing empties
       while (out.length && out[out.length-1]==='') out.pop();
       return out.join('\n');
     }
@@ -779,33 +650,16 @@
     document.querySelectorAll('.row').forEach(r=>{
       const roleInp = r.querySelector('.role'); if (roleInp) attachRoleListener(roleInp);
     });
-    document.querySelectorAll('.row').forEach(r => addPlayerWrapToRowIfAllowed(r));
-    bindRowHideButtons();
     bindStaticRowDeleteButtons();
     checkDuplicates();
 
-    // observe dynamic changes
+    // observe dynamic changes to attach listeners to newly added rows
     const observer = new MutationObserver(muts=>{
       muts.forEach(m=>{
         m.addedNodes.forEach(node=>{
           if (!(node instanceof HTMLElement)) return;
           node.querySelectorAll && node.querySelectorAll('.role').forEach(attachRoleListener);
-          node.querySelectorAll && node.querySelectorAll('.row').forEach(r=>{
-            addPlayerWrapToRowIfAllowed(r);
-            bindPlayerToggle(r);
-          });
-          if (node.matches && node.matches('.note-item')) {
-            const chk = node.querySelector('.playerChk');
-            const mention = node.querySelector('.playerMention');
-            if (chk && mention) {
-              chk.addEventListener('change', ()=> {
-                if (chk.checked) mention.style.display='inline-block';
-                else { mention.style.display='none'; mention.value=''; node.dataset.mention=''; }
-              });
-              mention.addEventListener('input', ()=> { node.dataset.mention = mention.value.trim(); });
-            }
-          }
-          bindRowHideButtons(); bindStaticRowDeleteButtons();
+          bindStaticRowDeleteButtons();
         });
       });
     });
