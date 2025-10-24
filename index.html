@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>تقرير العمليات - الميناء</title>
+  <title>تقرير العمليات - الطوارئ</title>
   <link href="./style.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -67,7 +67,7 @@
 
     .add-btn { background:transparent; color:var(--accent); border:1px dashed rgba(39,174,96,0.35); padding:6px 10px; border-radius:8px; cursor:pointer; }
     .controls { display:flex; gap:8px; margin-top:10px; }
-    .report-output { width:100%; min-height:220px; resize:vertical; padding:12px; background:#222; color:#ddd; border-radius:8px; border:1px solid rgba(255,255,255,0.03); white-space:pre-wrap; direction:rtl; }
+    .report-output { width:100%; min-height:220px; resize:vertical; padding:12px; background:#222; color:#ddd; border-radius:8px; border:1px solid rgba(255,255,255,0.03); white-space:pre-wrap; direction:rtl }
 
     .del-btn { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#ff6b6b; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700; }
     .edit-btn { background:transparent; border:1px dashed rgba(255,255,255,0.06); color:#ffd36b; padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700; }
@@ -107,13 +107,13 @@
 
   <div class="top-nav">
     <nav>
-      <div class="btn-pill outline" aria-hidden="true">تقرير العمليات الميناء</div>
+      <div class="btn-pill outline" aria-hidden="true">تقرير العمليات - الطوارئ</div>
       <a class="btn-pill filled" href="https://boletofsf.odoo.com/" target="_blank" rel="noopener noreferrer">العودة إلى الموقع</a>
     </nav>
   </div>
 
   <section class="card">
-    <h1 class="title">تقرير العـــمـــلــيــات في الميناء</h1>
+    <h1 class="title">تقرير العـــمـــلــيــات في الطوارئ</h1>
     <p class="small-note">املأ الحقول ثم اضغط "انشاء التقرير"</p>
 
     <form id="reportForm" onsubmit="return false;">
@@ -136,8 +136,8 @@
 
       <div class="section">
         <h3>القيادة العامة</h3>
-        <div class="row"><label>قائد امن المنشأت</label><input class="input role" data-role="قائد امن المنشأت" value="H-000" /></div>
-        <div class="row"><label>نائب قائد امن المنشأت</label><input class="input role" data-role="نائب قائد امن المنشأت" value="H-000" /></div>
+        <div class="row"><label>قائد قوات الطوارئ</label><input class="input role" data-role="قائد قوات الطوارئ" value="H-000" /></div>
+        <div class="row"><label>مساعد قائد قوات الطوارئ</label><input class="input role" data-role="مساعد قائد قوات الطوارئ" value="H-000" /></div>
       </div>
 
       <div class="section" id="leadershipSection">
@@ -165,67 +165,61 @@
         <button type="button" class="add-btn" data-target="radaList">＋ إضافة ردع</button>
       </div>
 
-      <div class="section" id="barqSection">
-        <h3>برق (قابل للإضافة)</h3>
-        <div id="barqList">
-          <div class="row"><label>برق 1</label><input class="input role" data-role="برق 1" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>برق 2</label><input class="input role" data-role="برق 2" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
+      <div class="section" id="radSection">
+        <h3>رعد (قابل للإضافة)</h3>
+        <div id="radList">
+          <div class="row"><label>رعد 1</label><input class="input role" data-role="رعد 1" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
+          <div class="row"><label>رعد 2</label><input class="input role" data-role="رعد 2" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
+          <div class="row"><label>رعد 3</label><input class="input role" data-role="رعد 3" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
         </div>
-        <button type="button" class="add-btn" data-target="barqList">＋ إضافة برق</button>
+        <button type="button" class="add-btn" data-target="radList">＋ إضافة رعد</button>
       </div>
 
-      <div class="section" id="sahmSection">
-        <h3>سهم</h3>
-        <div id="sahmList">
-          <div class="row"><label>سهم 1</label><input class="input role" data-role="سهم 1" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>سهم 2</label><input class="input role" data-role="سهم 2" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
+      <div class="section" id="regionsSection">
+        <h3>المناطق</h3>
+        <div id="coastalList">
+          <!-- شمال -->
+          <div class="row"><label>شمال 1</label><input class="input role" data-role="شمال 1" value="H-000"/></div>
+          <div class="row"><label>رمح 1</label><input class="input role" data-role="رمح 1" value="H-000"/></div>
+          <div class="row"><label>شين 1</label><input class="input role" data-role="شين 1" value="H-000"/></div>
+          <div class="row"><label>شين 2</label><input class="input role" data-role="شين 2" value="H-000"/></div>
+          <div class="row"><label>شين 3</label><input class="input role" data-role="شين 3" value="H-000"/></div>
+
+          <!-- جنوب -->
+          <div class="row"><label>جنوب 1</label><input class="input role" data-role="جنوب 1" value="H-000"/></div>
+          <div class="row"><label>رمح 2</label><input class="input role" data-role="رمح 2" value="H-000"/></div>
+          <div class="row"><label>جيم 1</label><input class="input role" data-role="جيم 1" value="H-000"/></div>
+          <div class="row"><label>جيم 2</label><input class="input role" data-role="جيم 2" value="H-000"/></div>
+          <div class="row"><label>جيم 3</label><input class="input role" data-role="جيم 3" value="H-000"/></div>
+
+          <!-- شرق -->
+          <div class="row"><label>شرق 1</label><input class="input role" data-role="شرق 1" value="H-000"/></div>
+          <div class="row"><label>رمح 3</label><input class="input role" data-role="رمح 3" value="H-000"/></div>
+          <div class="row"><label>قاف 1</label><input class="input role" data-role="قاف 1" value="H-000"/></div>
+          <div class="row"><label>قاف 2</label><input class="input role" data-role="قاف 2" value="H-000"/></div>
+          <div class="row"><label>قاف 3</label><input class="input role" data-role="قاف 3" value="H-000"/></div>
+
+          <!-- غرب -->
+          <div class="row"><label>غرب 1</label><input class="input role" data-role="غرب 1" value="H-000"/></div>
+          <div class="row"><label>رمح 4</label><input class="input role" data-role="رمح 4" value="H-000"/></div>
+          <div class="row"><label>غين 1</label><input class="input role" data-role="غين 1" value="H-000"/></div>
+          <div class="row"><label>غين 2</label><input class="input role" data-role="غين 2" value="H-000"/></div>
+          <div class="row"><label>غين 3</label><input class="input role" data-role="غين 3" value="H-000"/></div>
+
         </div>
-      </div>
-
-      <div class="section" id="securitySupervisorsSection">
-        <h3>مسؤولين البوابات</h3>
-        <div id="securitySupervisors">
-          <div class="row"><label>مشرف أمن 1</label><input class="input role" data-role="مشرف أمن 1" value="H-000"/></div>
-          <div class="row"><label>أمن 1</label><input class="input role" data-role="أمن 1" value="H-000"/></div>
-          <div class="row"><label>مساندة أمن 1</label><input class="input role" data-role="مساندة أمن 1" value="H-000"/></div>
-
-          <div class="row spacer" aria-hidden="true"><div style="flex:1;height:10px"></div></div>
-
-          <div class="row"><label>مشرف أمن 2</label><input class="input role" data-role="مشرف أمن 2" value="H-000"/></div>
-          <div class="row"><label>أمن 2</label><input class="input role" data-role="أمن 2" value="H-000"/></div>
-        </div>
-      </div>
-
-      <div class="section" id="huraSection">
-        <h3>حرة (قابل للإضافة)</h3>
-        <div id="huraList">
-          <div class="row"><label>حرة 1</label><input class="input role" data-role="حرة 1" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>حرة 2</label><input class="input role" data-role="حرة 2" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>حرة 3</label><input class="input role" data-role="حرة 3" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>حرة 4</label><input class="input role" data-role="حرة 4" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>حرة 5</label><input class="input role" data-role="حرة 5" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-        </div>
-        <button type="button" class="add-btn" data-target="huraList">＋ إضافة حرة</button>
-      </div>
-
-      <div class="section" id="saqrSection">
-        <h3>صقر (قابل للإضافة)</h3>
-        <div id="saqrList">
-          <div class="row"><label>صقر 1</label><input class="input role" data-role="صقر 1" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-          <div class="row"><label>صقر 2</label><input class="input role" data-role="صقر 2" value="H-000"/><button type="button" class="hide-btn">اخفاء</button></div>
-        </div>
-        <button type="button" class="add-btn" data-target="saqrList">＋ إضافة صقر</button>
       </div>
 
       <div style="margin-top:12px;">
         <div class="row"><label>شرطة عسكرية</label><input class="input role" data-role="شرطة عسكرية" value="H-000"/></div>
       </div>
 
-      <div style="margin-top:12px;">
-        <div id="coastalList">
-          <div class="row"><label>عين 1</label><input class="input role" data-role="عين 1" value="H-000"/></div>
-          <div class="row"><label>ساحل 1</label><input class="input role" data-role="ساحل 1" value="H-000"/></div>
-          <div class="row"><label>سجن 1</label><input class="input role" data-role="سجن 1" value="H-000"/></div>
+      <div class="section" id="criminalSection">
+        <h3>البحث الجنائي</h3>
+        <div id="criminalList">
+          <div class="row"><label>قائد فرقة البحث الجنائي</label><input class="input role" data-role="قائد فرقة البحث الجنائي" value="H-000"/></div>
+          <div class="row"><label>نائب الفرقة</label><input class="input role" data-role="نائب الفرقة" value="H-000"/></div>
+          <div class="row"><label>جنائي 1</label><input class="input role" data-role="جنائي 1" value="H-000"/></div>
+          <div class="row"><label>جنائي 2</label><input class="input role" data-role="جنائي 2" value="H-000"/></div>
         </div>
       </div>
 
@@ -239,28 +233,28 @@
         </div>
       </div>
 
-      <div class="section" id="criminalSection">
-        <h3>البحث الجنائي</h3>
-        <div id="criminalList">
-          <div class="row"><label>قائد فرقة البحث الجنائي</label><input class="input role" data-role="قائد فرقة البحث الجنائي" value="H-000"/></div>
-          <div class="row"><label>نائب الفرقة</label><input class="input role" data-role="نائب الفرقة" value="H-000"/></div>
-          <div class="row"><label>جنائي 1</label><input class="input role" data-role="جنائي 1" value="H-000"/></div>
-          <div class="row"><label>جنائي 2</label><input class="input role" data-role="جنائي 2" value="H-000"/></div>
-        </div>
-      </div>
-
       <div class="section" id="securitySection">
         <h3>الأمن والحماية</h3>
         <div id="securityList">
           <div class="row"><label>حماية 1</label><input class="input role" data-role="حماية 1" value="H-000"/></div>
           <div class="row"><label>حماية 2</label><input class="input role" data-role="حماية 2" value="H-000"/></div>
+          <div class="row"><label>حماية 3</label><input class="input role" data-role="حماية 3" value="H-000"/></div>
+          <div class="row"><label>حماية 4</label><input class="input role" data-role="حماية 4" value="H-000"/></div>
+        </div>
+      </div>
+
+      <div class="section" id="prisonsSection">
+        <div style="margin-top:6px;">
+          <div class="row"><label>عين 1</label><input class="input role" data-role="عين 1" value="H-000"/></div>
+          <div class="row"><label>سجن 1</label><input class="input role" data-role="سجن 1" value="H-000"/></div>
+          <div class="row"><label>سجن 2</label><input class="input role" data-role="سجن 2" value="H-000"/></div>
         </div>
       </div>
 
       <div class="section" id="notesSection">
         <div class="row">
           <label class="green-heading">ملاحظة رئيسية</label>
-          <input id="noteField" class="input" value="مساندة الطوارئ" />
+          <input id="noteField" class="input" value="" />
         </div>
 
         <div class="row">
@@ -296,7 +290,7 @@
 
   <script>
     // lists where hide-btn (not delete) is used
-    const HIDE_LIST_IDS = ['huraList','saqrList','barqList','radaList','sahmList'];
+    const HIDE_LIST_IDS = ['huraList','saqrList','radList','radaList','sahmList'];
 
     const EXCLUDED_LABELS = ['قائد امن المنشأت','نائب قائد امن المنشأت','وقت استلام الشفت'];
     const EXCLUDE_PREFIXES = ['قيادة'];
@@ -639,45 +633,24 @@
       if (addBlankAfter) out.push('');
     }
 
-    // coastal groups keep their internal gaps; they do NOT add an extra trailing blank.
+    // coastal groups now act as generic region list; keep internal order
     function appendCoastalWithGaps(out){
       const container = document.getElementById('coastalList'); if (!container) return;
       const rows = Array.from(container.querySelectorAll('.row'));
-      const ayn = rows.filter(r => (r.querySelector('label')||{}).textContent.trim().startsWith('عين'));
-      const sah = rows.filter(r => (r.querySelector('label')||{}).textContent.trim().startsWith('ساحل'));
-      const sijn = rows.filter(r => (r.querySelector('label')||{}).textContent.trim().startsWith('سجن'));
-      let pushedAny = false;
-      ayn.forEach(r => {
+      rows.forEach(r => {
         if (r.dataset.hidden==='true') return;
         const roleName = (r.querySelector('label')||{}).textContent || '';
         const codeInput = r.querySelector('.role'); const playerChk = r.querySelector('.playerChk'); const mention = r.querySelector('.playerMention');
-        let val='H-000'; if (playerChk && playerChk.checked) { const raw=(mention && mention.value)?mention.value.trim():''; if (raw) val = raw.startsWith('@')?raw:('@'+raw); else val='@'; } else if (codeInput) val = (codeInput.value && codeInput.value.trim())?codeInput.value.trim():'H-000';
-        out.push(roleName + ' : ' + val); pushedAny = true;
+        let val='H-000'; if (playerChk && playerChk.checked) { const raw=(mention && mention.value)?mention.value.trim():''; if (raw) val = raw.startsWith('@')?raw:('@'+raw); else val='@'; } else if (codeInput) { val = (codeInput.value && codeInput.value.trim())? codeInput.value.trim() : 'H-000'; }
+        if (roleName) out.push(roleName + ' : ' + val);
       });
-      if (ayn.length) out.push('');
-      sah.forEach(r => {
-        if (r.dataset.hidden==='true') return;
-        const roleName = (r.querySelector('label')||{}).textContent || '';
-        const codeInput = r.querySelector('.role'); const playerChk = r.querySelector('.playerChk'); const mention = r.querySelector('.playerMention');
-        let val='H-000'; if (playerChk && playerChk.checked) { const raw=(mention && mention.value)?mention.value.trim():''; if (raw) val = raw.startsWith('@')?raw:('@'+raw); else val='@'; } else if (codeInput) val = (codeInput.value && codeInput.value.trim())?codeInput.value.trim():'H-000';
-        out.push(roleName + ' : ' + val); pushedAny = true;
-      });
-      if (sah.length) out.push('');
-      sijn.forEach(r => {
-        if (r.dataset.hidden==='true') return;
-        const roleName = (r.querySelector('label')||{}).textContent || '';
-        const codeInput = r.querySelector('.role'); const playerChk = r.querySelector('.playerChk'); const mention = r.querySelector('.playerMention');
-        let val='H-000'; if (playerChk && playerChk.checked) { const raw=(mention && mention.value)?mention.value.trim():''; if (raw) val = raw.startsWith('@')?raw:('@'+raw); else val='@'; } else if (codeInput) val = (codeInput.value && codeInput.value.trim())?codeInput.value.trim():'H-000';
-        out.push(roleName + ' : ' + val); pushedAny = true;
-      });
-      // do NOT push a trailing blank here; caller will manage section separation
     }
 
     // build report - precise control of blanks:
     function buildReportText(){
       checkDuplicates();
       const out=[];
-      const shiftLabel='الميناء';
+      const shiftLabel='الطوارئ';
       const timeLabel='6 صباحا';
 
       out.push('تقرير العـــمـــلــيــات في ' + shiftLabel);
@@ -687,15 +660,20 @@
 
       const rawOps = (document.getElementById('operations').value||'').trim();
       const rawOpsDeputy = (document.getElementById('opsDeputy').value||'').trim();
-      const operations = rawOps ? (rawOps.startsWith('@')?rawOps:('@'+rawOps)) : '@';
-      const opsDeputy = rawOpsDeputy ? (rawOpsDeputy.startsWith('@')?rawOpsDeputy:('@'+rawOpsDeputy)) : '@';
-      out.push('العمليات : ' + operations);
-      out.push('نائب العمليات : ' + opsDeputy);
+      const operations = rawOps ? (rawOps.startsWith('@')?rawOps:('@'+rawOps)) : '';
+      const opsDeputy = rawOpsDeputy ? (rawOpsDeputy.startsWith('@')?rawOpsDeputy:('@'+rawOpsDeputy)) : '';
+      out.push('العمليات : ' + (operations || ''));
+      out.push('نائب العمليات : ' + (opsDeputy || ''));
       out.push('');
 
       // leaders block
+      const leaderMain = document.querySelector('input[data-role="قائد قوات الطوارئ"]');
+      if (leaderMain) out.push(leaderMain.getAttribute('data-role') + ' : ' + (leaderMain.value && leaderMain.value.trim() ? leaderMain.value.trim() : 'H-000'));
+      const leaderAssist = document.querySelector('input[data-role="مساعد قائد قوات الطوارئ"]');
+      if (leaderAssist) out.push(leaderAssist.getAttribute('data-role') + ' : ' + (leaderAssist.value && leaderAssist.value.trim() ? leaderAssist.value.trim() : 'H-000'));
+
+      out.push('');
       appendFromContainer('leadershipList', out, false);
-      // ensure a blank after that group
       out.push('');
 
       // dh officer
@@ -708,17 +686,17 @@
       }
       out.push('');
 
-      // append several small lists and keep single blank after them
+      // rada and rad
       appendFromContainer('radaList', out, false);
-      appendFromContainer('barqList', out, false);
-      appendFromContainer('sahmList', out, false);
+      out.push('');
+      appendFromContainer('radList', out, false);
       out.push('');
 
-      appendFromContainer('securitySupervisors', out, false);
-      appendFromContainer('huraList', out, false);
-      appendFromContainer('saqrList', out, false);
+      // regions (north/south/east/west)
+      appendCoastalWithGaps(out);
       out.push('');
 
+      // police
       const police = document.querySelector('input[data-role="شرطة عسكرية"]');
       if (police) {
         const row = police.closest('.row'); const playerChk = row?row.querySelector('.playerChk'):null; const mention = row?row.querySelector('.playerMention'):null;
@@ -728,28 +706,26 @@
         out.push('');
       }
 
-      // Now sections that require: heading, one blank, items, one blank
-      // - البحث الجنائي
+      // الجنائي
       out.push('البحث الجنائي');
-      out.push(''); // blank between heading and first item
+      out.push('');
       appendFromContainer('criminalList', out, false);
-      out.push(''); // blank after the group
+      out.push('');
 
-      // - القوات الخاصة
+      // القوات الخاصة
       out.push('القوات الخاصة');
       out.push('');
       appendFromContainer('specialForcesList', out, false);
       out.push('');
 
-      // - الأمن والحماية
+      // الأمن والحماية
       out.push('الأمن والحماية');
       out.push('');
       appendFromContainer('securityList', out, false);
       out.push('');
 
-      // coastal groups (will include internal gaps)
-      appendCoastalWithGaps(out);
-      // add a separating blank after coastal if there was content
+      // prisons / عين
+      appendFromContainer('prisonsSection', out, false);
       out.push('');
 
       // notes
