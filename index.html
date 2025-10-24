@@ -334,9 +334,23 @@
       return false;
     }
 
+    // Get preferred value for a row: prefer mention if present, else the role input value, else H-000
+    // IMPORTANT: we DO NOT add '@' automatically here — we return the text exactly as typed by the user.
+    function getRowValue(row) {
+      if (!row) return 'H-000';
+      const mention = row.querySelector('.trusted-mention');
+      if (mention && (mention.value || '').trim()) {
+        return mention.value.trim(); // return raw, no automatic '@'
+      }
+      const codeInput = row.querySelector('.role');
+      if (codeInput && (codeInput.value || '').trim()) return codeInput.value.trim();
+      return 'H-000';
+    }
+
     // Add trusted checkbox UI to a given row (append at the end so it appears on the left visually in RTL)
-    // New behavior: checkbox + small inline mention input (as in screenshot). When checked the mention input is shown and focused.
-    // Typing in the mention syncs to the .role input (adds @ if missing). On uncheck original value is restored.
+    // Behavior: when checkbox is checked the small mention field appears and you can type the player's name.
+    // While checked the visible code input remains H-000. When building the report we read the mention value (if any)
+    // via getRowValue() and use it in the report without adding '@' automatically.
     function addCheckboxToRow(row) {
       if (!row || !(row instanceof HTMLElement)) return;
       if (row.classList && row.classList.contains('spacer')) return;
@@ -362,11 +376,10 @@
       mention.setAttribute('dir', 'rtl');
       mention.autocomplete = 'off';
 
-      // label element (clickable, keyboard accessible)
       const lbl = document.createElement('span');
       lbl.className = 'trusted-label';
       lbl.textContent = 'لاعب معتمد';
-      lbl.tabIndex = 0; // focusable
+      lbl.tabIndex = 0;
       lbl.addEventListener('click', (e)=>{
         cb.checked = !cb.checked;
         cb.dispatchEvent(new Event('change'));
@@ -393,56 +406,51 @@
         }
       }
 
-      // when checkbox toggles
       cb.addEventListener('change', (ev)=>{
         const roleInput = row.querySelector('input.role') || row.querySelector('input');
+        if (!roleInput) return;
+
         if (cb.checked) {
-          // show mention input and focus
+          // Save original and show mention. Keep visible code as H-000.
           setOriginal(roleInput);
-          mention.style.display = 'inline-block';
-          // if roleInput already contains @name, prefill mention
+
+          // if roleInput already contains an @mention, prefill mention with it (without altering the visible code)
           const cur = (roleInput && roleInput.value) ? roleInput.value.trim() : '';
           if (cur && cur.startsWith('@')) {
             mention.value = cur;
           } else {
             mention.value = '';
           }
+
+          // Keep visible code as H-000 while trusted mode is on
+          roleInput.value = 'H-000';
+          roleInput.dataset.trusted = '1';
+
+          mention.style.display = 'inline-block';
           setTimeout(()=> mention.focus(), 0);
+
         } else {
-          // hide mention and restore original role value (keeps behavior tidy)
-          mention.style.display = 'none';
-          // if mention had content, keep that value in role; otherwise restore original
+          // when unchecking: hide mention and either apply its value to roleInput or restore original
           const raw = (mention.value || '').trim();
+          mention.style.display = 'none';
           if (raw) {
-            // keep mention in roleInput
-            if (roleInput) roleInput.value = raw.startsWith('@') ? raw : ('@' + raw);
+            // apply raw value into the main input (we keep previous behavior of copying to role input on uncheck)
+            roleInput.value = raw;
           } else {
-            // restore previous
             restoreOriginal(roleInput);
           }
-          // clear mention value
           mention.value = '';
+          delete roleInput.dataset.trusted;
           checkDuplicates();
         }
       });
 
-      // sync mention -> role input live (and on blur)
-      mention.addEventListener('input', ()=>{
-        const roleInput = row.querySelector('input.role') || row.querySelector('input');
-        if (!roleInput) return;
-        const raw = (mention.value || '').trim();
-        if (raw) roleInput.value = raw.startsWith('@') ? raw : ('@' + raw);
-        else roleInput.value = roleInput.dataset._original || 'H-000';
-        attachRoleListener(roleInput);
+      // We don't sync mention -> roleInput live while trusted. Keep mention separate.
+      // But run duplicate check when mention changes in case UI needs updating.
+      mention.addEventListener('input', ()=> {
         checkDuplicates();
       });
-      mention.addEventListener('blur', ()=>{
-        // ensure sync on blur
-        const roleInput = row.querySelector('input.role') || row.querySelector('input');
-        if (!roleInput) return;
-        const raw = (mention.value || '').trim();
-        if (raw) roleInput.value = raw.startsWith('@') ? raw : ('@' + raw);
-        attachRoleListener(roleInput);
+      mention.addEventListener('blur', ()=> {
         checkDuplicates();
       });
 
@@ -623,6 +631,7 @@
         if (!row) return;
         if (row.dataset.hidden==='true' || getComputedStyle(row).display==='none') return;
         const v = (inp.value||'').trim().toUpperCase();
+        // ignore H-000 and mentions when checking duplicates (we only check actual code-like values)
         if (!v || v==='H-000' || v.startsWith('@')) return;
         if (!map.has(v)) map.set(v,[]);
         map.get(v).push({inp,row});
@@ -649,6 +658,7 @@
       if (dupFound) document.getElementById('dupWarning').style.display='block';
     }
 
+    // helper used when building report: prefer mention if present (no automatic '@')
     function appendFromContainer(containerId, out, addBlankAfter = false) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -657,9 +667,7 @@
         if (row.classList && row.classList.contains('spacer')) { if (addBlankAfter) out.push(''); return; }
         if (row.dataset.hidden==='true' || getComputedStyle(row).display==='none') return;
         const roleName = (row.querySelector('label')||{}).textContent || '';
-        const codeInput = row.querySelector('.role');
-        let val = 'H-000';
-        if (codeInput) val = (codeInput.value && codeInput.value.trim())? codeInput.value.trim() : 'H-000';
+        const val = getRowValue(row);
         if (roleName) out.push(roleName + ' : ' + val);
       });
       if (addBlankAfter) out.push('');
@@ -672,11 +680,17 @@
         if (r.dataset.hidden==='true' || getComputedStyle(r).display==='none') return;
         if (r.classList && r.classList.contains('spacer')) { out.push(''); return; }
         const roleName = (r.querySelector('label')||{}).textContent || '';
-        const codeInput = r.querySelector('.role');
-        let val='H-000';
-        if (codeInput) val = (codeInput.value && codeInput.value.trim())? codeInput.value.trim() : 'H-000';
+        const val = getRowValue(r);
         if (roleName) out.push(roleName + ' : ' + val);
       });
+    }
+
+    // helper: if input belongs to a .row use getRowValue, otherwise use input.value (raw, no '@' auto)
+    function getValueFromInputOrRow(input) {
+      if (!input) return 'H-000';
+      const row = input.closest && input.closest('.row');
+      if (row) return getRowValue(row);
+      return (input.value && input.value.trim()) ? input.value.trim() : 'H-000';
     }
 
     function buildReportText(){
@@ -690,18 +704,19 @@
       out.push('تم استلام عمليات ' + shiftLabel + ' في تمام الساعه ' + timeLabel);
       out.push('');
 
+      // NOTE: do NOT automatically add '@' here — use exactly what the user typed
       const rawOps = (document.getElementById('operations').value||'').trim();
       const rawOpsDeputy = (document.getElementById('opsDeputy').value||'').trim();
-      const operations = rawOps ? (rawOps.startsWith('@')?rawOps:('@'+rawOps)) : '';
-      const opsDeputy = rawOpsDeputy ? (rawOpsDeputy.startsWith('@')?rawOpsDeputy:('@'+rawOpsDeputy)) : '';
+      const operations = rawOps ? rawOps : '';
+      const opsDeputy = rawOpsDeputy ? rawOpsDeputy : '';
       out.push('العمليات : ' + (operations || ''));
       out.push('نائب العمليات : ' + (opsDeputy || ''));
       out.push('');
 
       const leaderMain = document.querySelector('input[data-role="قائد قوات الطوارئ"]');
-      if (leaderMain) out.push(leaderMain.getAttribute('data-role') + ' : ' + (leaderMain.value && leaderMain.value.trim() ? leaderMain.value.trim() : 'H-000'));
+      if (leaderMain) out.push((leaderMain.getAttribute('data-role') || 'قائد قوات الطوارئ') + ' : ' + getValueFromInputOrRow(leaderMain));
       const leaderAssist = document.querySelector('input[data-role="مساعد قائد قوات الطوارئ"]');
-      if (leaderAssist) out.push(leaderAssist.getAttribute('data-role') + ' : ' + (leaderAssist.value && leaderAssist.value.trim() ? leaderAssist.value.trim() : 'H-000'));
+      if (leaderAssist) out.push((leaderAssist.getAttribute('data-role') || 'مساعد قائد قوات الطوارئ') + ' : ' + getValueFromInputOrRow(leaderAssist));
 
       out.push('');
       appendFromContainer('leadershipList', out, false);
@@ -709,8 +724,8 @@
 
       const dh = document.querySelector('input[data-role="ضابط خفر"]');
       if (dh) {
-        let val = (dh.value && dh.value.trim())?dh.value.trim():'H-000';
-        out.push(dh.getAttribute('data-role') + ' : ' + val);
+        let val = getValueFromInputOrRow(dh);
+        out.push((dh.getAttribute('data-role') || 'ضابط خفر') + ' : ' + val);
       }
       out.push('');
 
@@ -724,8 +739,8 @@
 
       const police = document.querySelector('input[data-role="شرطة عسكرية"]');
       if (police) {
-        let val = (police.value && police.value.trim())?police.value.trim():'H-000';
-        out.push(police.getAttribute('data-role') + ' : ' + val);
+        let val = getValueFromInputOrRow(police);
+        out.push((police.getAttribute('data-role') || 'شرطة عسكرية') + ' : ' + val);
         out.push('');
       }
 
