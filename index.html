@@ -84,19 +84,38 @@
     .spacer { height:10px; }
 
     /* Trusted checkbox styles (per-row) */
-    .trusted-wrap { display:flex; gap:6px; align-items:center; user-select:none; }
+    .trusted-wrap { display:flex; gap:8px; align-items:center; user-select:none; }
     .trusted-checkbox { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
-    .trusted-label { color:#ddd; font-size:12px; cursor:pointer; }
+    .trusted-label { color:#ddd; font-size:12px; cursor:pointer; outline:none; }
+
+    /* small inline mention input to match requested design */
+    .trusted-mention {
+      display:none;
+      min-width:120px;
+      max-width:180px;
+      padding:6px 10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.06);
+      background:#1a1a1a;
+      color:#ddd;
+      font-size:13px;
+      text-align:right;
+      direction:rtl;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+    .trusted-mention::placeholder { color:#9b9b9b; }
 
     @media (max-width:980px){
       .card{width:92%; padding:16px;}
       .title{font-size:22px}
       .row label{min-width:120px}
+      .trusted-mention { min-width:90px; max-width:140px; }
     }
     @media (max-width:480px){
       .card{width:92%}
       .title{font-size:20px}
       .row label{min-width:100px}
+      .trusted-mention { min-width:80px; max-width:120px; }
     }
   </style>
 </head>
@@ -301,11 +320,31 @@
       input.dataset.listenerAttached='1';
     }
 
-    // Add trusted checkbox UI to a given row (appended at the end so it appears on the LEFT visually in RTL)
+    // Helper: whether this row label should get the trusted checkbox
+    function matchesTrustedLabel(labelText){
+      if (!labelText) return false;
+      const t = labelText.trim();
+      const prefixes = ['ردع','رعد','رمح','شمال','جنوب','شرق','غرب','شين','قاف','جيم','غين','سجن','عين','حماية','حزم'];
+      for (const p of prefixes){
+        if (t.startsWith(p)) return true;
+      }
+      if (t.includes('نائب الفرقة')) return true;
+      if (t.includes('قائد فرقة')) return true;
+      if (t.includes('بحث') || t.includes('جنائي')) return true;
+      return false;
+    }
+
+    // Add trusted checkbox UI to a given row (append at the end so it appears on the left visually in RTL)
+    // New behavior: checkbox + small inline mention input (as in screenshot). When checked the mention input is shown and focused.
+    // Typing in the mention syncs to the .role input (adds @ if missing). On uncheck original value is restored.
     function addCheckboxToRow(row) {
       if (!row || !(row instanceof HTMLElement)) return;
       if (row.classList && row.classList.contains('spacer')) return;
       if (row.querySelector('.trusted-wrap')) return; // already exists
+
+      const lblNode = row.querySelector('label');
+      const labelText = (lblNode && lblNode.textContent) ? lblNode.textContent.trim() : '';
+      if (!matchesTrustedLabel(labelText)) return;
 
       const trustedWrap = document.createElement('div');
       trustedWrap.className = 'trusted-wrap';
@@ -314,40 +353,104 @@
       cb.type = 'checkbox';
       cb.className = 'trusted-checkbox';
       cb.title = 'لاعب معتمد';
+      cb.setAttribute('aria-label', 'لاعب معتمد');
 
+      const mention = document.createElement('input');
+      mention.type = 'text';
+      mention.className = 'trusted-mention';
+      mention.placeholder = '@اسم اللاعب';
+      mention.setAttribute('dir', 'rtl');
+      mention.autocomplete = 'off';
+
+      // label element (clickable, keyboard accessible)
       const lbl = document.createElement('span');
       lbl.className = 'trusted-label';
       lbl.textContent = 'لاعب معتمد';
+      lbl.tabIndex = 0; // focusable
       lbl.addEventListener('click', (e)=>{
-        // toggle checkbox on label click
         cb.checked = !cb.checked;
         cb.dispatchEvent(new Event('change'));
         e.stopPropagation();
       });
-
-      // when checkbox is checked, prompt for username and set mention into this row's input
-      cb.addEventListener('change', (ev)=>{
-        if (!cb.checked) return; // do nothing on uncheck
-        const name = prompt('ادخل اسم المستخدم ليتم منشنه في هذه الخانة (بدون @):');
-        if (!name) {
-          // user cancelled -> uncheck
-          cb.checked = false;
-          return;
+      lbl.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          cb.checked = !cb.checked;
+          cb.dispatchEvent(new Event('change'));
+          e.stopPropagation();
         }
-        const mention = name.startsWith('@') ? name : ('@' + name);
-        // find the input in this row (prefer .role)
-        const inp = row.querySelector('input.role') || row.querySelector('input');
-        if (inp) {
-          inp.value = mention;
-          attachRoleListener(inp);
+      });
+
+      // store and restore original value
+      function setOriginal(inp) {
+        if (inp && inp.dataset._original === undefined) inp.dataset._original = inp.value || '';
+      }
+      function restoreOriginal(inp) {
+        if (!inp) return;
+        if (inp.dataset._original !== undefined) {
+          inp.value = inp.dataset._original || 'H-000';
+          delete inp.dataset._original;
+        }
+      }
+
+      // when checkbox toggles
+      cb.addEventListener('change', (ev)=>{
+        const roleInput = row.querySelector('input.role') || row.querySelector('input');
+        if (cb.checked) {
+          // show mention input and focus
+          setOriginal(roleInput);
+          mention.style.display = 'inline-block';
+          // if roleInput already contains @name, prefill mention
+          const cur = (roleInput && roleInput.value) ? roleInput.value.trim() : '';
+          if (cur && cur.startsWith('@')) {
+            mention.value = cur;
+          } else {
+            mention.value = '';
+          }
+          setTimeout(()=> mention.focus(), 0);
+        } else {
+          // hide mention and restore original role value (keeps behavior tidy)
+          mention.style.display = 'none';
+          // if mention had content, keep that value in role; otherwise restore original
+          const raw = (mention.value || '').trim();
+          if (raw) {
+            // keep mention in roleInput
+            if (roleInput) roleInput.value = raw.startsWith('@') ? raw : ('@' + raw);
+          } else {
+            // restore previous
+            restoreOriginal(roleInput);
+          }
+          // clear mention value
+          mention.value = '';
           checkDuplicates();
         }
       });
 
+      // sync mention -> role input live (and on blur)
+      mention.addEventListener('input', ()=>{
+        const roleInput = row.querySelector('input.role') || row.querySelector('input');
+        if (!roleInput) return;
+        const raw = (mention.value || '').trim();
+        if (raw) roleInput.value = raw.startsWith('@') ? raw : ('@' + raw);
+        else roleInput.value = roleInput.dataset._original || 'H-000';
+        attachRoleListener(roleInput);
+        checkDuplicates();
+      });
+      mention.addEventListener('blur', ()=>{
+        // ensure sync on blur
+        const roleInput = row.querySelector('input.role') || row.querySelector('input');
+        if (!roleInput) return;
+        const raw = (mention.value || '').trim();
+        if (raw) roleInput.value = raw.startsWith('@') ? raw : ('@' + raw);
+        attachRoleListener(roleInput);
+        checkDuplicates();
+      });
+
+      trustedWrap.appendChild(mention);
       trustedWrap.appendChild(cb);
       trustedWrap.appendChild(lbl);
 
-      // append to end of row so in RTL it will appear on the left side visually
+      // append to end of row so in RTL it appears on the left visually
       row.appendChild(trustedWrap);
     }
 
@@ -358,7 +461,7 @@
       const del = document.createElement('button'); del.type='button'; del.className='del-btn'; del.textContent='حذف';
       del.addEventListener('click', ()=> { row.remove(); checkDuplicates(); });
       row.appendChild(label); row.appendChild(input); row.appendChild(del);
-      addCheckboxToRow(row);
+      addCheckboxToRow(row); // add checkbox + mention only when matchesTrustedLabel
       attachRoleListener(input);
       return row;
     }
@@ -676,9 +779,6 @@
         setTimeout(()=>copyBtn.textContent='نسخ التقرير',1500);
       } catch(e) { alert('فشل النسخ — جرّب يدوياً'); }
     });
-
-    // NOTE: تمت إزالة زر "لاعب معتمد" من الشريط العلوي والوظيفة المرتبطة به.
-    // يبقى السلوك الخاص بمربعات "لاعب معتمد" لكل صف (تفتح prompt عند التفعيل) كما هو.
 
     // initial binding: add checkboxes to existing rows, attach listeners
     document.querySelectorAll('.row').forEach(r=>{
