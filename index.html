@@ -290,6 +290,10 @@
       <div class="section" id="prisonsSection">
         <div style="margin-top:6px;">
           <div class="row"><label>عين 1</label><input class="input role" data-role="عين 1" value="H-000"/></div>
+
+          <!-- spacer between عين and سجن -->
+          <div class="row spacer"></div>
+
           <div class="row"><label>سجن 1</label><input class="input role" data-role="سجن 1" value="H-000"/></div>
           <div class="row"><label>سجن 2</label><input class="input role" data-role="سجن 2" value="H-000"/></div>
         </div>
@@ -664,7 +668,8 @@
       if (!container) return;
       const rows = container.querySelectorAll('.row');
       rows.forEach(row=>{
-        if (row.classList && row.classList.contains('spacer')) { if (addBlankAfter) out.push(''); return; }
+        // always treat spacer rows as a blank line in the generated report
+        if (row.classList && row.classList.contains('spacer')) { out.push(''); return; }
         if (row.dataset.hidden==='true' || getComputedStyle(row).display==='none') return;
         const roleName = (row.querySelector('label')||{}).textContent || '';
         const val = getRowValue(row);
