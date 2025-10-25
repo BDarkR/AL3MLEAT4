@@ -137,7 +137,10 @@
       <div class="section">
         <div class="row">
           <label>وقت استلام الشفت</label>
-          <input id="shiftTimeDisplay" class="input" value="6 صباحا" readonly />
+          <select id="shiftTimeSelect" class="input" aria-label="وقت استلام الشفت">
+            <option value="6 صباحا">6 صباحا</option>
+            <option value="6 مساء">6 مساء</option>
+          </select>
         </div>
 
         <div class="row">
@@ -315,7 +318,7 @@
   <script>
     const EXCLUDED_LABELS = ['قائد امن المنشأت','نائب قائد امن المنشأت','وقت استلام الشفت'];
     const EXCLUDE_PREFIXES = ['قيادة'];
-    const EXCLUDED_INPUT_IDS = ['operations','opsDeputy','shiftTimeDisplay','noteCode','noteCount','noteType'];
+    const EXCLUDED_INPUT_IDS = ['operations','opsDeputy','shiftTimeSelect','noteCode','noteCount','noteType'];
 
     function attachRoleListener(input) {
       if (!input) return;
@@ -702,7 +705,8 @@
       checkDuplicates();
       const out=[];
       const shiftLabel='الطوارئ';
-      const timeLabel='6 صباحا';
+      const shiftSelect = document.getElementById('shiftTimeSelect');
+      const timeLabel = shiftSelect ? shiftSelect.value : '6 صباحا';
 
       out.push('تقرير العـــمـــلــيــات في ' + shiftLabel);
       out.push('');
